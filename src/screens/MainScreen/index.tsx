@@ -138,7 +138,7 @@ const MainScreen = () => {
               ref={webViewRef}
               source={{uri: activeItem}}
               javaScriptEnabled={true}
-              javaScriptEnabledAndroid={true}
+              // javaScriptEnabledAndroid={true}
               allowFileAccessFromFileURLs={true}
               allowFileAccess={true}
               allowUniversalAccessFromFileURLs={true}

@@ -23,7 +23,7 @@ const AuthScreen: React.FC = () => {
   );
 
   const handleLogin = useCallback(() => {
-    storage.clearAll();
+    // storage.clearAll();
     const user = authUser(email, password);
     if (user) {
       storage.set('email', `${user.email}`);
