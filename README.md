@@ -39,5 +39,7 @@ yarn ios
 ```
 ## Step 4: Login credentials
 
+```bash
 email: user@gmail.com
-password": 123
+password: 123
+```
