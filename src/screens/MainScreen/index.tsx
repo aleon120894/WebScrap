@@ -39,17 +39,16 @@ const MainScreen = () => {
 
   const injectedJavaScript = useMemo(
     () => `
-    (() => {
+    (function() {
+      const copyrightTexts = [];
       let findCopyrightFromFooter = () => {
         const footerElements = document.querySelectorAll('footer');
-    
-        const copyrightTexts = [];
-      
         footerElements.forEach((footerElement) => {
           const innerHTML = footerElement.innerHTML;
           const innerText = footerElement.innerText;
-      
+        
           let match = innerHTML.match(${copyrightRegex});
+          
           if (match) {
             copyrightTexts.push(...match);
             return;
@@ -60,12 +59,10 @@ const MainScreen = () => {
             copyrightTexts.push(...match);
           }
         });
-      
-        return copyrightTexts;
       };
       
       let footerCopyrights = findCopyrightFromFooter();
-      window.ReactNativeWebView.postMessage(footerCopyrights);
+      copyrightTexts.length && window.ReactNativeWebView.postMessage(copyrightTexts[0]);
     })();
     true
   `,
@@ -90,6 +87,7 @@ const MainScreen = () => {
 
   const handleOnMessage = useCallback(
     (data: WebViewMessageEvent & string) => {
+      // const footerCopyrights = findCopyrightFromFooter(data);
       setCopyright('');
       const getText = data.trim();
       if (getText) {

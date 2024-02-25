@@ -10,7 +10,6 @@
     "test": "jest"
   },
   "dependencies": {
-    "cheerio": "^1.0.0-rc.12",
     "react": "18.2.0",
     "react-native": "0.72.9",
     "react-native-mmkv": "^2.12.1",
