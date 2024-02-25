@@ -20,8 +20,9 @@ interface ISiteData {
 const MainScreen = () => {
   const [sitesData, setSitesData] = useState<ISiteData[]>([]);
   const [activeItem, setActiveItem] = useState<string>('');
-  const [copyright, setCopyright] = useState<string>('');
+  const [copyright, setCopyright] = useState<string | undefined>('');
   const [isLoading, setIsLoading] = useState<Boolean>(false);
+  const [isLoadingPage, setIsLoadingPage] = useState<Boolean>(false);
 
   const webViewRef = useRef<WebView>(null);
   const copyrightRegex = useMemo(
@@ -70,24 +71,25 @@ const MainScreen = () => {
   );
 
   const handleSelectSite = useCallback((item: string) => {
-    setCopyright('');
-    setIsLoading(true);
     setActiveItem(item);
   }, []);
 
   const handleStartLoad = useCallback(() => {
+    setCopyright('');
+    setIsLoadingPage(true);
     const cp = storage.getString(activeItem);
+    cp && setCopyright(cp);
     !cp && setIsLoading(true);
   }, [activeItem]);
 
   const handleLoadEnd = useCallback(() => {
     webViewRef.current?.injectJavaScript(injectedJavaScript);
+    setIsLoadingPage(false);
     setIsLoading(false);
   }, [injectedJavaScript]);
 
   const handleOnMessage = useCallback(
     (data: WebViewMessageEvent & string) => {
-      // const footerCopyrights = findCopyrightFromFooter(data);
       setCopyright('');
       const getText = data.trim();
       if (getText) {
@@ -136,7 +138,6 @@ const MainScreen = () => {
               ref={webViewRef}
               source={{uri: activeItem}}
               javaScriptEnabled={true}
-              // javaScriptEnabledAndroid={true}
               allowFileAccessFromFileURLs={true}
               allowFileAccess={true}
               allowUniversalAccessFromFileURLs={true}
@@ -146,10 +147,19 @@ const MainScreen = () => {
               cacheEnabled={true}
             />
           )}
+          {isLoadingPage && (
+            <View style={styles.loaderContainer}>
+              <ActivityIndicator size={'large'} />
+            </View>
+          )}
         </View>
         <View style={styles.cpWrapper}>
           {activeItem &&
-            (isLoading ? <ActivityIndicator /> : <Text>{copyright}</Text>)}
+            (isLoading ? (
+              <ActivityIndicator />
+            ) : (
+              <Text>{isLoadingPage ? '' : copyright}</Text>
+            ))}
         </View>
       </View>
     </SafeAreaView>
@@ -174,6 +184,16 @@ const styles = StyleSheet.create({
     width: '100%',
     alignItems: 'center',
     paddingHorizontal: 20,
+  },
+  loaderContainer: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(255,255,255,0.8)',
   },
   textGreeting: {
     fontSize: 15,
